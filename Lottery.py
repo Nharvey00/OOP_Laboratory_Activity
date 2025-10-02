@@ -1,46 +1,54 @@
 import random
 
-print("=" * 50)
-print("   Harvey mors Corporation")
-print("   6/60 Lottery Game")
-print("=" * 50)
-print("\nWelcome to the 6/60 Lottery!")
-print("Pick 6 numbers from 1 to 60")
-print("Play slip cost: ₱20\n")
+class LotteryGame:
+    def __init__(self):
+        self.winning_numbers = set(random.sample(range(1, 61), 6))
+        self.player_numbers = set()
+    
+    def set_player_numbers(self, numbers):
+        if len(numbers) == 6 and all(1 <= n <= 60 for n in numbers) and len(set(numbers)) == 6:
+            self.player_numbers = set(numbers)
+            return True
+        return False
+    
+    def calculate_prize(self):
+        matches = len(self.winning_numbers & self.player_numbers)
+        return 1000000 if matches == 6 else matches * 1000
+    
+    def display_results(self):
+        matches = len(self.winning_numbers & self.player_numbers)
+        prize = self.calculate_prize()
+        
+        print("\n" + "=" * 60)
+        print("LOTTERY 6/60 RESULTS")
+        print("=" * 60)
+        print(f"Winning Numbers: {sorted(self.winning_numbers)}")
+        print(f"Your Numbers:    {sorted(self.player_numbers)}")
+        print(f"Matches: {matches}/6")
+        print(f"Prize: ₱{prize:,}" + (" - JACKPOT!" if matches == 6 else ""))
+        print("=" * 60 + "\n")
 
-winning_numbers = sorted(random.sample(range(1, 61), 6))
+
+# Usage
+print("=" * 60)
+print("LOTTERY GAME 6/60")
+print("=" * 60)
+print("Enter 6 numbers (1-60):\n")
+
+lottery = LotteryGame()
 player_numbers = []
 
-for i in range(6):
-    while True:
-        num = int(input(f"Enter number {i+1}: "))
-        if 1 <= num <= 60:
-            if num not in player_numbers:
-                player_numbers.append(num)
-                break
-            else:
-                print("Number already chosen. Pick a different number.")
+while len(player_numbers) < 6:
+    try:
+        num = int(input(f"Number {len(player_numbers) + 1}: "))
+        if num < 1 or num > 60:
+            print("Invalid! Must be 1-60.")
+        elif num in player_numbers:
+            print("Duplicate!")
         else:
-            print("Invalid! Enter a number between 1 and 60.")
+            player_numbers.append(num)
+    except ValueError:
+        print("Invalid input.")
 
-player_numbers.sort()
-
-matched_numbers = [num for num in player_numbers if num in winning_numbers]
-matches = len(matched_numbers)
-
-print("\n" + "=" * 50)
-print("LOTTERY RESULTS")
-print("=" * 50)
-print(f"Winning Numbers: {winning_numbers}")
-print(f"Your Numbers: {player_numbers}")
-print(f"\nMatched Numbers: {matched_numbers}")
-print(f"Total Matches: {matches}\n")
-
-if matches == 6:
-    prize = 1000000
-    print("CONGRATULATIONS! YOU WON THE JACKPOT!")
-else:
-    prize = matches * 1000
-
-print(f"Total Prize: ₱{prize:,}")
-print("=" * 50)
+if lottery.set_player_numbers(player_numbers):
+    lottery.display_results()
